@@ -5,7 +5,6 @@ $stmt = $db->prepare("SELECT * FROM links WHERE token=?");
 $stmt->execute([$token]);
 if(!$stmt->fetch()){ die("Ungültiger Link"); }
 
-// Upload prüfen
 if(isset($_FILES['pdf'])){
     $file = $_FILES['pdf']['tmp_name'];
     $stmt = $db->query("SELECT * FROM config ORDER BY id DESC LIMIT 1");
