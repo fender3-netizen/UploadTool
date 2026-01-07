@@ -1,55 +1,65 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 require_once 'config_env.php';
 
-// ----------------------
-// Prüft Admin-Login
-// ----------------------
+/**
+ * Prüft, ob Admin eingeloggt ist
+ */
 function checkAdmin() {
-    global $db;
-    if(!isset($_SESSION['loggedin']) || !$_SESSION['loggedin']){
+    if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
         header("Location: index.php");
         exit;
     }
 }
 
-// ----------------------
-// Token generieren
-// ----------------------
-function generateToken($length = 12){
-    return substr(str_shuffle("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"), 0, $length);
+/**
+ * Zufälligen Token generieren
+ */
+function generateToken($length = 16) {
+    return bin2hex(random_bytes($length / 2));
 }
 
-// ----------------------
-// PDF-Mindestgröße prüfen (erste Seite)
-// ----------------------
-function checkPDFSize($filePath, $minWidthMM, $minHeightMM){
-    require_once __DIR__ . '/vendor/autoload.php'; // FPDI
+/**
+ * Prüft PDF-Größe (erste Seite) mit FPDI
+ */
+function checkPDFSize($filePath, $minWidthMM, $minHeightMM) {
+
+    // FPDI nur laden, wenn benötigt
+    require_once __DIR__ . '/vendor/autoload.php';
+
     $pdf = new \setasign\Fpdi\Fpdi();
     $pageCount = $pdf->setSourceFile($filePath);
+
+    if ($pageCount < 1) {
+        return false;
+    }
+
     $tpl = $pdf->importPage(1);
     $size = $pdf->getTemplateSize($tpl);
 
-    $width = $size['width'];
-    $height = $size['height'];
+    $widthMM  = $size['width'];
+    $heightMM = $size['height'];
 
-    return ($width >= $minWidthMM && $height >= $minHeightMM);
+    return ($widthMM >= $minWidthMM && $heightMM >= $minHeightMM);
 }
 
-// ----------------------
-// SQL-Datei importieren (beim ersten Start)
-// ----------------------
-function importSQL($sqlFile){
+/**
+ * Importiert SQL-Datei beim ersten Start
+ */
+function importSQL($sqlFile) {
     global $db;
-    $stmt = $db->query("SHOW TABLES LIKE 'admin'");
-    if($stmt->rowCount() == 0){
-        $sql = file_get_contents($sqlFile);
-        $db->exec($sql);
+
+    if (!file_exists($sqlFile)) {
+        return;
     }
+
+    $stmt = $db->query("SHOW TABLES");
+    if ($stmt->rowCount() > 0) {
+        return;
+    }
+
+    $sql = file_get_contents($sqlFile);
+    $db->exec($sql);
 }
 
-// Import direkt ausführen
-importSQL
+// SQL-Import automatisch ausführen
+importSQL(__DIR__ . '/standardkonfigurator.sql');
