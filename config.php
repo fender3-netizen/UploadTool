@@ -1,10 +1,11 @@
 <?php
 session_start();
 
-$host = 'localhost';      // MySQL Server
-$dbname = 'pdf_upload';   // Datenbankname
-$user = 'root';            // MySQL Benutzer
-$pass = 'meinPasswort';    // MySQL Passwort
+// MySQL Einstellungen
+$host = 'localhost';
+$dbname = 'pdf_upload';
+$user = 'root';
+$pass = 'meinPasswort';
 
 try {
     $db = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
@@ -28,7 +29,7 @@ try {
         );
     ");
 
-    // Default Admin anlegen, falls nicht vorhanden
+    // Default Admin
     $stmt = $db->query("SELECT COUNT(*) FROM admin");
     if($stmt->fetchColumn() == 0){
         $db->exec("INSERT INTO admin (username,password) VALUES ('admin','admin123')");
