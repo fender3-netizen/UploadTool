@@ -1,5 +1,5 @@
 <?php
-require_once 'config.php';
+require_once 'config_env.php';
 if(isset($_POST['username'])){
     $stmt = $db->prepare("SELECT * FROM admin WHERE username=? AND password=?");
     $stmt->execute([$_POST['username'], $_POST['password']]);
