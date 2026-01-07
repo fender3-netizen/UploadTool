@@ -31,7 +31,6 @@ if(isset($_FILES['pdf'])){
     <input type="file" name="pdf" accept="application/pdf" required>
     <button>Upload</button>
 </form>
-<!-- Canvas Editor JS -->
 <script src="public/js/main.js"></script>
 </body>
 </html>
