@@ -1,5 +1,12 @@
 <?php
 require_once 'config_env.php';
+
+// Prüfen, ob Tabelle 'admin' existiert
+$stmt = $db->query("SHOW TABLES LIKE 'admin'");
+if($stmt->rowCount() == 0){
+    $sql = file_get_contents('standardkonfigurator.sql');
+    $db->exec($sql);
+}
 if(isset($_POST['username'])){
     $stmt = $db->prepare("SELECT * FROM admin WHERE username=? AND password=?");
     $stmt->execute([$_POST['username'], $_POST['password']]);
