@@ -1,20 +1,18 @@
 <?php
-require_once 'config_env.php';
+require_once 'functions.php';
 
-// Prüfen, ob Tabelle 'admin' existiert
-$stmt = $db->query("SHOW TABLES LIKE 'admin'");
-if($stmt->rowCount() == 0){
-    $sql = file_get_contents('standardkonfigurator.sql');
-    $db->exec($sql);
-}
 if(isset($_POST['username'])){
-    $stmt = $db->prepare("SELECT * FROM admin WHERE username=? AND password=?");
-    $stmt->execute([$_POST['username'], $_POST['password']]);
-    if($stmt->fetch()){
+    $stmt = $db->prepare("SELECT * FROM admin WHERE username=?");
+    $stmt->execute([$_POST['username']]);
+    $user = $stmt->fetch();
+    if($user && $_POST['password'] === $user['password']){
+        // Klartext-Passwort
         $_SESSION['loggedin'] = true;
         header("Location: admin.php");
         exit;
-    } else $error="Login fehlgeschlagen";
+    } else {
+        $error = "Login fehlgeschlagen";
+    }
 }
 ?>
 <!DOCTYPE html>
