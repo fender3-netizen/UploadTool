@@ -1,5 +1,5 @@
 <?php
-require_once 'config.php';
+require_once 'config_env.php';
 
 // Prüft, ob Admin eingeloggt ist
 function checkAdmin() {
