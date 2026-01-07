@@ -1,17 +1,17 @@
 <?php
 require_once 'functions.php';
 
+$error = '';
 if(isset($_POST['username'])){
     $stmt = $db->prepare("SELECT * FROM admin WHERE username=?");
     $stmt->execute([$_POST['username']]);
     $user = $stmt->fetch();
-    if($user && $_POST['password'] === $user['password']){
-        // Klartext-Passwort
+    if($user && $_POST['password'] === $user['password']){ // Klartext-Passwort
         $_SESSION['loggedin'] = true;
         header("Location: admin.php");
         exit;
     } else {
-        $error = "Login fehlgeschlagen";
+        $error = "Login fehlgeschlagen!";
     }
 }
 ?>
@@ -25,6 +25,6 @@ if(isset($_POST['username'])){
     <input name="password" type="password" placeholder="Passwort" required>
     <button>Login</button>
 </form>
-<?php if(isset($error)) echo "<p>$error</p>"; ?>
+<?php if($error) echo "<p style='color:red;'>$error</p>"; ?>
 </body>
 </html>
