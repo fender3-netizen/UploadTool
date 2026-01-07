@@ -1,22 +1,29 @@
 <?php
 require_once 'config_env.php';
 
+// ----------------------
 // Prüft Admin-Login
+// ----------------------
 function checkAdmin() {
+    global $db;
     if(!isset($_SESSION['loggedin']) || !$_SESSION['loggedin']){
         header("Location: index.php");
         exit;
     }
 }
 
+// ----------------------
 // Token generieren
-function generateToken($length=8){
-    return substr(str_shuffle("abcdefghijklmnopqrstuvwxyz0123456789"), 0, $length);
+// ----------------------
+function generateToken($length = 12){
+    return substr(str_shuffle("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"), 0, $length);
 }
 
-// Prüft PDF Seitenmaße (erste Seite)
+// ----------------------
+// PDF-Mindestgröße prüfen (erste Seite)
+// ----------------------
 function checkPDFSize($filePath, $minWidthMM, $minHeightMM){
-    require_once('vendor/autoload.php'); // FPDI
+    require_once __DIR__ . '/vendor/autoload.php'; // FPDI
     $pdf = new \setasign\Fpdi\Fpdi();
     $pageCount = $pdf->setSourceFile($filePath);
     $tpl = $pdf->importPage(1);
@@ -28,7 +35,9 @@ function checkPDFSize($filePath, $minWidthMM, $minHeightMM){
     return ($width >= $minWidthMM && $height >= $minHeightMM);
 }
 
-// SQL-Datei importieren, falls Tabellen fehlen
+// ----------------------
+// SQL-Datei importieren (beim ersten Start)
+// ----------------------
 function importSQL($sqlFile){
     global $db;
     $stmt = $db->query("SHOW TABLES LIKE 'admin'");
@@ -38,6 +47,5 @@ function importSQL($sqlFile){
     }
 }
 
-// Import beim ersten Start
-importSQL('standardkonfigurator.sql');
-?>
+// Import direkt ausführen
+importSQL
